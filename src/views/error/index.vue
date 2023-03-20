@@ -4,7 +4,7 @@
 
 <template>
   <div>
-$END$
+    <h2>ERROR: 403</h2>
   </div>
 </template>
 

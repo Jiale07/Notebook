@@ -4,7 +4,7 @@ interface BaseClass {
     updateTime: string;
     isDeleted: number;
 }
-interface Matters extends BaseClass {
+interface Matter extends BaseClass {
     name: string;
     content: string;
     typeId?: string,
@@ -21,13 +21,13 @@ interface MatterTypeGrade extends BaseClass {
     value: number
 }
 
-const SortValue = {
-    First: 1,
-    Second: 2,
-    Third: 3,
-    Fourth: 4,
-    Fifth: 5,
-}
+// const SortValue = {
+//     First: 1,
+//     Second: 2,
+//     Third: 3,
+//     Fourth: 4,
+//     Fifth: 5,
+// }
 
 interface MatterFrom {
     name: string,
@@ -38,6 +38,7 @@ export {
     Matter,
     MatterType,
     MatterTypeGrade,
+
 
     MatterFrom,
 }

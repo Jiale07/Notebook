@@ -4,7 +4,7 @@
 
 <template>
   <div>
-$END$
+    node
   </div>
 </template>
 

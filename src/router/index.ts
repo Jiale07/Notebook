@@ -1,25 +1,55 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import remainingRouter from "@/router/modules/remaining";
+import {SessionStorage} from "@/util/storageTool"
+import home from "@/router/modules/home";
 
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
 
+const sessionStorage = new SessionStorage()
+const allRouter = [...remainingRouter, ...home,]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes: allRouter
+})
+
+router.beforeEach((to, from, next) => {
+  // if (allRouter.find(item => item.path === to.path)) {
+  //   if (to.name === 'Error') {
+  //     next()
+  //   }
+  //
+  //   if (!storageSession.getItem('user-info')) {
+  //     if (to.name === 'Login') {
+  //       next()
+  //     } else {
+  //       next({name: 'Login'})
+  //     }
+  //   } else {
+  //     if (to.name === 'Login') {
+  //       router.push(from.fullPath)
+  //     } else {
+  //       next()
+  //     }
+  //   }
+  // } else {
+  //   next({path: '/error'})
+  // }
+  if (to.name === 'Error') {
+    next()
+  }
+
+  if (!sessionStorage.getItem('user-info')) {
+    if (to.name === 'Login') {
+      next()
+    } else {
+      next({name: 'Login'})
+    }
+  } else {
+    if (to.name === 'Login') {
+      router.push(from.fullPath)
+    } else {
+      next()
+    }
+  }
 })
 
 export default router
