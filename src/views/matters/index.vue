@@ -11,6 +11,7 @@ import {ElMessage, ElTabs} from "element-plus";
 import {simpleUUID} from '@/util/uuid'
 import MatterList from './components/matterList.vue'
 import {MatterTypeList} from "@/util/constant/matters";
+import {Matter} from "@/util/interface/matter";
 
 const tabList = ref(MatterTypeList)
 const allTabIdList = MatterTypeList.map(item => item.id)
@@ -26,8 +27,9 @@ let listKey = ref(simpleUUID())
 
 const editDialogVisible = ref(false)
 
-function visibleDialog() {
+function handleAddMatter() {
   editDialogVisible.value = true
+  editMatter.value = {}
 }
 
 function handleEditDialogVisible() {
@@ -73,7 +75,12 @@ function handleDeleteMatter(id: string) {
   })
 }
 
-
+let editMatter = ref({})
+function handleRowOnClick(matter: Matter) {
+  console.log(matter)
+  editMatter.value = matter
+  editDialogVisible.value = true
+}
 // 列表展示
 </script>
 
@@ -89,6 +96,7 @@ function handleDeleteMatter(id: string) {
             :key="listKey"
             :matter-list="matterList"
             @on-delete-matter="handleDeleteMatter"
+            @on-click="handleRowOnClick"
         >
           <template v-slot:header>
             <div class="header">
@@ -98,7 +106,7 @@ function handleDeleteMatter(id: string) {
                 </span>
               </div>
               <div class="button-list">
-                <el-button type="primary" :icon="Edit" circle @click="visibleDialog"></el-button>
+                <el-button type="primary" :icon="Edit" circle @click="handleAddMatter"></el-button>
                 <el-button :icon="Setting" circle @click="matterSaveSetting"></el-button>
               </div>
             </div>
@@ -109,6 +117,7 @@ function handleDeleteMatter(id: string) {
 
     <MatterEdit
         v-model:visible="editDialogVisible"
+        :matter="editMatter"
         @on-close="handleEditDialogVisible"
         @on-callback="handleCallback"
         :key="editDialogKey"

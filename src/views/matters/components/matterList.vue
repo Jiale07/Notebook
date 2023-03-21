@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import SvgIcon from '@/components/svgIcon/index.vue'
+import {Matter} from "@/util/interface/matter";
 const props = defineProps({
   matterList: {
     type: Array,
@@ -7,10 +8,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['on-deleteMatter'])
+const emit = defineEmits(['on-deleteMatter', 'on-click'])
 
 function handleDeleteMatter(id: string) {
   emit('on-deleteMatter', id)
+}
+function handleClick(matter: Matter) {
+  emit('on-click', matter)
 }
 </script>
 
@@ -23,7 +27,7 @@ function handleDeleteMatter(id: string) {
           class-name="svg-icon"
           @click="handleDeleteMatter(item.id)"
       ></svg-icon>
-      <div class="content-box">
+      <div class="content-box" @click="handleClick(item)">
         <span class="content">{{ item.content }}</span>
       </div>
     </div>

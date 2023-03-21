@@ -1,24 +1,32 @@
 <script lang="ts" setup>
 import {reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
-import {setMatter} from '../matterApi'
+import {setMatter, updateMatter} from '../matterApi'
 import {MatterTypeList, MatterSortValueList} from "@/util/constant/matters";
 import {MatterType} from "@/util/interface/matter";
+import {simpleUUID} from "@/util/uuid";
+import {Matter} from '@/util/interface/matter'
 
 const props = defineProps({
   visible: {
     type: Boolean,
     required: false,
+  },
+  matter: {
+    type: Object,
+    default: () => {
+    }
   }
 })
 const dialogVisible = ref(false)
-watch (
+watch(
     () => props.visible,
     value => {
       dialogVisible.value = value
     }
 )
 const emit = defineEmits(['update:visible', 'on-callback'])
+
 function handleClose() {
   emit('update:visible', false)
 }
@@ -30,24 +38,28 @@ interface MatterFrom {
   typeId?: number
   priority?: number
 }
+
 const emptyMatter = {
   name: '',
   content: '',
   typeId: 0,
   priority: 0
 }
+
 interface MatterFromItem {
   key: string,
   label: string,
   value: string | number
-  isSelect? :boolean
+  isSelect?: boolean
   options?: Array<Options>
 }
+
 interface Options {
   key: string,
   label: string,
   value: string | number
 }
+
 function formatOptions(list: Array<MatterType>): Array<Options> {
   return list.map(item => {
     return {
@@ -57,7 +69,8 @@ function formatOptions(list: Array<MatterType>): Array<Options> {
     }
   })
 }
-const matterFromItemList = reactive<Array<MatterFromItem>>([
+
+let matterFromItemList = reactive<Array<MatterFromItem>>([
   {
     key: 'name',
     label: '名称',
@@ -85,6 +98,7 @@ const matterFromItemList = reactive<Array<MatterFromItem>>([
 ])
 
 const matterFrom: MatterFrom = emptyMatter
+
 function handleAddMatter(): void {
   let submitMatterObj: MatterFrom = emptyMatter
   matterFromItemList.forEach(item => {
@@ -104,20 +118,70 @@ function handleAddMatter(): void {
     ElMessage.error('事项的名称和内容不能为空！')
     return
   }
+  if (Object.keys(props.matter).length) {
+    let {id, createTime, updateTime, isDeleted, isComplete} = props.matter
+    let {name, content, typeId, priority} = submitMatterObj
+    let params: Matter = {
+      id,
+      createTime,
+      updateTime,
+      isDeleted,
+      isComplete,
 
-  setMatter(submitMatterObj).then(value => {
-    if (value === 'success') {
-      handleClose()
-      emit('on-callback')
-      ElMessage.success('保存成功')
-    } else {
-      ElMessage.warning('保存错误')
+      name,
+      content,
+      typeId: String(typeId),
+      priority,
     }
-  }).catch(e => {
-    ElMessage.error(e.message)
-  })
+    updateMatter(params).then(value => {
+      if (value === 'success') {
+        handleClose()
+        emit('on-callback')
+        ElMessage.success('保存成功')
+      } else {
+        ElMessage.warning('保存错误')
+      }
+    }).catch(e => {
+      ElMessage.error(e.message)
+    })
+  } else {
+    setMatter(submitMatterObj).then(value => {
+      if (value === 'success') {
+        handleClose()
+        emit('on-callback')
+        ElMessage.success('保存成功')
+      } else {
+        ElMessage.warning('保存错误')
+      }
+    }).catch(e => {
+      ElMessage.error(e.message)
+    })
+  }
 }
 
+
+const elFormKey = ref(simpleUUID())
+watch(
+    () => props.matter,
+    value => {
+      if (Object.keys(value).length) {
+        matterFromItemList = reactive(matterFromItemList.map(item => {
+          return {
+            ...item,
+            value: item.key === 'type'? value['typeId'] : value[item.key]
+          }
+        }))
+      } else {
+        matterFromItemList = reactive(matterFromItemList.map(item => {
+          return {
+            ...item,
+            value: ''
+          }
+        }))
+      }
+      elFormKey.value = simpleUUID()
+    }
+)
 </script>
 
 <template>
@@ -128,7 +192,7 @@ function handleAddMatter(): void {
       :before-close="handleClose"
   >
     <template #default>
-      <el-form :model="matterFrom">
+      <el-form :model="matterFrom" :key="elFormKey">
         <el-form-item
             v-for="(item) in matterFromItemList"
             :key="`from-item-${item.key}`"
