@@ -73,7 +73,6 @@ function updateMatter(matter: Matter) {
             reject({message: '没有找到对应的事项，请刷新页面'})
         }
         matterList.splice(updateMatterIndex, 1, matter)
-        console.log('matterList', matterList)
         updateMatterList(matterList)
         resolve('success')
     })

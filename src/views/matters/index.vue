@@ -77,7 +77,6 @@ function handleDeleteMatter(id: string) {
 
 let editMatter = ref({})
 function handleRowOnClick(matter: Matter) {
-  console.log(matter)
   editMatter.value = matter
   editDialogVisible.value = true
 }
