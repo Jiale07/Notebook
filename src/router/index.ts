@@ -37,7 +37,7 @@ router.beforeEach((to, from, next) => {
     next()
   }
 
-  if (!sessionStorage.getItem('user-info')) {
+  if (!sessionStorage.getItem('token')) {
     if (to.name === 'Login') {
       next()
     } else {

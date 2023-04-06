@@ -2,28 +2,24 @@
 import {reactive} from "vue";
 import router from "@/router";
 import { ElMessage } from "element-plus";
-import { SessionStorage } from '@/util/storageTool'
-
+import {login} from "@/axios/modules/user";
 
 const ruleFrom = reactive({
-  username: 'jiale',
+  phone: '18812341234',
   password: '123456',
 })
 
 
 function onLogin() {
-  let {username, password} = ruleFrom
-  let success = username === 'jiale' && password === '123456'
-  return new Promise((resolve, reject)=> {
-    if (success) {
-      resolve(123)
+  let {phone, password} = ruleFrom
+  return login({phone, password}).then(res => {
+    let {code, message} = res.data
+    console.log('code === 200', code === 200)
+    if (code === 200) {
+      router.push('/')
     } else {
-      reject()
+      ElMessage.warning(message)
     }
-  }).then(() => {
-    const sessionStorage = new SessionStorage()
-    sessionStorage.setItem('user-info', JSON.stringify({name : ruleFrom.username}))
-    router.push('/')
   }).catch(err => {
     ElMessage.error(err || '登录失败，请稍后重试')
   })
@@ -37,12 +33,12 @@ function onLogin() {
       <div>
         <el-form class="form-box">
           <el-form-item
-            prop="username"
+            prop="phone"
           >
             <el-input
               clearable
               placeholder="Please enter the user name"
-              v-model.trim="ruleFrom.username"
+              v-model.trim="ruleFrom.phone"
             >
             </el-input>
           </el-form-item>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 const navList = reactive([
   {
@@ -27,6 +28,30 @@ function handleSelect(index: string): void {
 let scrollHeight = ref((() => {
   return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
 })())
+
+
+const userAboutButtonList = [
+  {
+    key: 'logout',
+    label: '退出登录',
+    clickFunction: logout
+  },
+  {
+    key: 'setting',
+    label: '设置',
+    clickFunction: toSetting
+  }
+]
+
+function logout() {
+  sessionStorage.removeItem('token')
+  router.push({
+    name: 'Login'
+  })
+}
+function toSetting() {
+  ElMessage.warning('暂不支持设置')
+}
 </script>
 
 <template>
@@ -45,16 +70,29 @@ let scrollHeight = ref((() => {
         >{{ item.title }}
         </el-menu-item>
       </el-menu>
-      <div class="setting-box">
-        <div class="setting-button">
-          <div class="user-img">
-            <img src="@/assets/logo.png" alt="">
-          </div>
-          <div class="user-name">
-            <span>UserName</span>
+      <el-dropdown>
+        <div class="setting-box">
+          <div class="setting-button">
+            <div class="user-img">
+              <img src="@/assets/logo.png" alt="">
+            </div>
+            <div class="user-name">
+              <span>UserName</span>
+            </div>
           </div>
         </div>
-      </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+                v-for="(item) in userAboutButtonList"
+                :key="item.key"
+                @click="item.clickFunction"
+            >
+              {{ item.label }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
     <router-view class="router-view-box"></router-view>
   </div>
@@ -117,5 +155,9 @@ let scrollHeight = ref((() => {
   .router-view-box {
     flex: 1;
   }
+}
+
+:deep(focus-visible) {
+  outline: none;
 }
 </style>

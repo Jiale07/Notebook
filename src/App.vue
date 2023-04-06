@@ -1,5 +1,5 @@
 <template>
-  <router-view/>
+  <router-view ></router-view>
 </template>
 
 <style lang="scss">
@@ -19,3 +19,5 @@
   #039BD2
   #7A9A9E
 -->
+<script setup lang="ts">
+</script>

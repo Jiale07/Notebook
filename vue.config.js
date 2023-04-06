@@ -5,6 +5,15 @@ function resolve(dir) {
 }
 module.exports = defineConfig({
   transpileDependencies: true,
+    devServer: {
+      host: 'localhost',
+      port: 3000,
+      proxy: {
+        '/notebookApi': {
+          target: `http://localhost:8080/`, pathRewrite: {'^/notebookApi': ''},
+        }
+      }
+    },
   chainWebpack: config => {
     config.resolve.alias.set("@", resolve("src"))
     config.module
