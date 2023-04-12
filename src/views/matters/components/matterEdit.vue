@@ -2,10 +2,11 @@
 import {reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 import {setMatter, updateMatter} from '../matterApi'
-import {MatterTypeList, MatterSortValueList} from "@/util/constant/matters";
+import {MatterSortValueList} from "@/util/constant/matters";
 import {MatterType} from "@/util/interface/matter";
 import {simpleUUID} from "@/util/uuid";
 import {Matter} from '@/util/interface/matter'
+import {getMatterTypeList} from "@/axios/modules/matterType";
 
 const props = defineProps({
   visible: {
@@ -69,6 +70,20 @@ function formatOptions(list: Array<MatterType>): Array<Options> {
     }
   })
 }
+let matterTypeList:MatterType[] = []
+async function initTabList() {
+  await getMatterTypeList().then(res => {
+    let {code, data, message} = res
+    if (code === 200) {
+      matterTypeList = data
+    } else {
+      ElMessage.warning(message)
+    }
+  }).finally(
+
+  )
+}
+initTabList()
 
 let matterFromItemList = reactive<Array<MatterFromItem>>([
   {
@@ -86,7 +101,7 @@ let matterFromItemList = reactive<Array<MatterFromItem>>([
     label: '类型',
     value: '',
     isSelect: true,
-    options: formatOptions(MatterTypeList)
+    options: formatOptions(matterTypeList)
   },
   {
     key: 'priority',

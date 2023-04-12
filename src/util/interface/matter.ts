@@ -2,7 +2,7 @@ interface BaseClass {
     id: string;
     createTime: string;
     updateTime: string;
-    isDeleted: number;
+    isDeleted?: number;
 }
 interface Matter extends BaseClass {
     name: string;

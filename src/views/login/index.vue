@@ -14,7 +14,6 @@ function onLogin() {
   let {phone, password} = ruleFrom
   return login({phone, password}).then(res => {
     let {code, message} = res.data
-    console.log('code === 200', code === 200)
     if (code === 200) {
       router.push('/')
     } else {

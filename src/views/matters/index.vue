@@ -3,24 +3,55 @@ import {
   Edit,
   Setting
 } from '@element-plus/icons-vue'
-import {ref, reactive} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import MatterSetting from "@/views/matters/components/matterSetting.vue";
 import MatterEdit from "@/views/matters/components/matterEdit.vue";
-import {getMatter, deleteMatter} from './matterApi'
-import {ElMessage, ElTabs} from "element-plus";
+import {deleteMatter} from './matterApi'
+import {dayjs, ElMessage, ElTabs} from "element-plus";
 import {simpleUUID} from '@/util/uuid'
 import MatterList from './components/matterList.vue'
-import {MatterTypeList} from "@/util/constant/matters";
-import {Matter} from "@/util/interface/matter";
+import {Matter as MatterInterface} from "@/util/interface/matter";
+import {getMatterList} from "@/axios/modules/matter";
+import {getMatterTypeList} from "@/axios/modules/matterType";
+import {MatterType} from '@/util/interface/matterType'
 
-const tabList = ref(MatterTypeList)
-const allTabIdList = MatterTypeList.map(item => item.id)
-const currTabValue = ref('10001')
+const tabList: MatterType[] = reactive([])
+const currTypeId = ref<string>( '')
+async function initTabList() {
+  await getMatterTypeList().then(res => {
+    let {code, data, message} = res
+    if (code === 200) {
+      data.forEach(item => {
+        if (tabList.length && tabList.find(item => item.id !== item.id)) {
+          tabList.push(item)
+        }
+      })
+    } else {
+      ElMessage.warning(message)
+    }
+  }).finally(
+
+  )
+  if (tabList.length) {
+    currTypeId.value = tabList[0]?.id
+  }
+  console.log('currTypeId', currTypeId)
+}
+onMounted(() => {
+  initTabList()
+})
+
+const allTabIdList = tabList.map(item => item.id)
+// const currTabValue = ref('10001')
+console.log('tabList', tabList)
+console.log('allTabIdList', allTabIdList)
+
+
 
 function handleTabClick(index: number) {
-  let {id} = tabList.value[index]
-  currTabValue.value = id
-  getMatterList()
+  let {id} = tabList[index]
+  currTypeId.value = id
+  initMatterList(currTypeId.value)
 }
 
 let listKey = ref(simpleUUID())
@@ -48,35 +79,44 @@ function handleChangeSettingVisible() {
   settingDialogVisible.value = false
 }
 
-function getMatterList() {
-  if (currTabValue.value === '10005') {
-    matterList = getMatter().filter(item => item.isDeleted === 0 && !allTabIdList.includes(String(item.typeId)))
-  } else {
-    matterList = getMatter().filter(item => item.isDeleted === 0 && item.typeId === currTabValue.value)
-  }
-  listKey.value = simpleUUID()
+function initMatterList(typeId: string) {
+  getMatterList({typeId: typeId}).then(res => {
+    let {code, data, message} = res
+    if (code === 200) {
+      matterList = data.map(item => {
+        return {
+          ...item,
+          createTime: dayjs(item.createTime).format('YYYY--mm-DD'),
+          updateTime: dayjs(item.updateTime).format('YYYY--mm-DD')
+        }
+      })
+    } else{
+      ElMessage.warning(message)
+    }
+  }).finally(() => {
+    listKey.value = simpleUUID()
+  })
 }
-
-getMatterList() // 初始化事项列表
+initMatterList(currTypeId.value) // 初始化事项列表
 
 let editDialogKey = ref(simpleUUID())
 
 function handleCallback() {
-  getMatterList()
+  initMatterList(currTypeId.value)
   editDialogKey.value = simpleUUID()
 }
 
 function handleDeleteMatter(id: string) {
   deleteMatter(id).then(() => {
     ElMessage.success('删除成功')
-    getMatterList()
+    initMatterList(currTypeId.value)
   }).catch(err => {
     ElMessage.error(err.message)
   })
 }
 
 let editMatter = ref({})
-function handleRowOnClick(matter: Matter) {
+function handleRowOnClick(matter: MatterInterface) {
   editMatter.value = matter
   editDialogVisible.value = true
 }
@@ -85,7 +125,7 @@ function handleRowOnClick(matter: Matter) {
 
 <template>
   <div class="matters-box">
-    <el-tabs type="border-card" @tab-change="handleTabClick">
+    <el-tabs type="border-card" @tab-change="handleTabClick($event)">
       <el-tab-pane
           v-for="item in tabList"
           :key="item.id"

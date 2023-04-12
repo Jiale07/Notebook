@@ -1,14 +1,10 @@
 import axios, {AxiosResponse} from 'axios'
 
+
 const service = axios.create({
     baseURL: '/notebookApi',
     timeout: 5000,
 })
-interface Result{
-    code: number,
-    data: unknown,
-    message: string
-}
 
 service.interceptors.request.use(config => {
     const token = sessionStorage.getItem('token')
@@ -26,7 +22,7 @@ service.interceptors.response.use(response => {
     if (token) {
         sessionStorage.setItem('token', token)
     }
-    return response
+    return response.data
 }, function (error) {
     return Promise.reject(error)
 })

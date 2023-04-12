@@ -32,48 +32,48 @@ const SortValue = {
 }
 
 // 事项类型临时性使用常量的形式进行配置。
-const MatterTypeList: Array<MatterType> = [
-    {
-        id: '10001',
-        name: '重要且紧急',
-        sortValue: SortValue.First,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10002',
-        name: '重要不紧急',
-        sortValue: SortValue.Second,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10003',
-        name: '不重要但紧急',
-        sortValue: SortValue.Third,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10004',
-        name: '不重要不紧急',
-        sortValue: SortValue.Fourth,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10005',
-        name: '未分类',
-        sortValue: SortValue.Fourth,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    }
-].filter(item => item.isDeleted === 0)
+// const MatterTypeList: Array<MatterType> = [
+//     {
+//         id: '10001',
+//         name: '重要且紧急',
+//         sortValue: SortValue.First,
+//         createTime: '1679277514036',
+//         updateTime: '1679277514036',
+//         isDeleted: 0
+//     },
+//     {
+//         id: '10002',
+//         name: '重要不紧急',
+//         sortValue: SortValue.Second,
+//         createTime: '1679277514036',
+//         updateTime: '1679277514036',
+//         isDeleted: 0
+//     },
+//     {
+//         id: '10003',
+//         name: '不重要但紧急',
+//         sortValue: SortValue.Third,
+//         createTime: '1679277514036',
+//         updateTime: '1679277514036',
+//         isDeleted: 0
+//     },
+//     {
+//         id: '10004',
+//         name: '不重要不紧急',
+//         sortValue: SortValue.Fourth,
+//         createTime: '1679277514036',
+//         updateTime: '1679277514036',
+//         isDeleted: 0
+//     },
+//     {
+//         id: '10005',
+//         name: '未分类',
+//         sortValue: SortValue.Fourth,
+//         createTime: '1679277514036',
+//         updateTime: '1679277514036',
+//         isDeleted: 0
+//     }
+// ].filter(item => item.isDeleted === 0)
 
 const MatterSortValueList = [
     {
@@ -111,6 +111,6 @@ export {
     MattersSaveModeName,
     MatterSaveModeKey,
 
-    MatterTypeList,
+    // MatterTypeList,
     MatterSortValueList,
 }
