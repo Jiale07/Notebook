@@ -21,15 +21,20 @@ function handleClick(matter: Matter) {
 <template>
   <div class="matter-list-box">
     <slot name="header"></slot>
-    <div class="matters-item" v-for="(item, index) in props.matterList" :key="`matter-${index}}`">
-      <svg-icon
-          icon-class="circle"
-          class-name="svg-icon"
-          @click="handleDeleteMatter(item.id)"
-      ></svg-icon>
-      <div class="content-box" @click="handleClick(item)">
-        <span class="content">{{ item.content }}</span>
+    <div v-if="matterList?.length">
+      <div class="matters-item" v-for="(item, index) in props.matterList" :key="`matter-${index}}`">
+        <svg-icon
+            icon-class="circle"
+            class-name="svg-icon"
+            @click="handleDeleteMatter(item.id)"
+        ></svg-icon>
+        <div class="content-box" @click="handleClick(item)">
+          <span class="content">{{ item.content }}</span>
+        </div>
       </div>
+    </div>
+    <div v-else>
+      <span>暂无更多......</span>
     </div>
   </div>
 </template>

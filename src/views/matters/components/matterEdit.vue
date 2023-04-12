@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import {reactive, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
-import {setMatter, updateMatter} from '../matterApi'
-import {MatterTypeList, MatterSortValueList} from "@/util/constant/matters";
+import {MatterSortValue, MatterSortValueList} from "@/util/constant/matters";
 import {MatterType} from "@/util/interface/matter";
 import {simpleUUID} from "@/util/uuid";
-import {Matter} from '@/util/interface/matter'
+import {getMatterTypeList} from "@/axios/modules/matterType";
+import {postCreateMatter, postUpdateMatter} from "@/axios/modules/matter";
 
 const props = defineProps({
   visible: {
@@ -33,8 +33,8 @@ function handleClose() {
 
 
 interface MatterFrom {
-  name: string,
-  content: string,
+  name?: string,
+  content?: string,
   typeId?: number
   priority?: number
 }
@@ -59,6 +59,23 @@ interface Options {
   label: string,
   value: string | number
 }
+let matterTypeList:MatterType[] = []
+async function initTabList() {
+  return await getMatterTypeList().then(res => {
+    let {code, data, message} = res
+    if (code === 200) {
+      matterTypeList = data
+      matterFromItemList.find(item => item.key === 'type')?.options?.push(...formatOptions(matterTypeList))
+    } else {
+      ElMessage.warning(message)
+    }
+  }).finally(
+
+  )
+}
+onMounted(async () => {
+  await initTabList()
+})
 
 function formatOptions(list: Array<MatterType>): Array<Options> {
   return list.map(item => {
@@ -69,7 +86,6 @@ function formatOptions(list: Array<MatterType>): Array<Options> {
     }
   })
 }
-
 let matterFromItemList = reactive<Array<MatterFromItem>>([
   {
     key: 'name',
@@ -86,79 +102,82 @@ let matterFromItemList = reactive<Array<MatterFromItem>>([
     label: '类型',
     value: '',
     isSelect: true,
-    options: formatOptions(MatterTypeList)
+    options: []
   },
   {
     key: 'priority',
     label: '优先级',
-    value: '',
+    value: MatterSortValue.Fifth,// 默认最低优先级
     isSelect: true,
     options: MatterSortValueList
   }
 ])
-
+interface CreateMatterParams {
+  name: string,
+  content: string,
+  typeId?: number,
+  priority?: number,
+}
 const matterFrom: MatterFrom = emptyMatter
-
-function handleAddMatter(): void {
-  let submitMatterObj: MatterFrom = emptyMatter
-  matterFromItemList.forEach(item => {
-    let {key, value} = JSON.parse(JSON.stringify(item))
-    if (key === 'name') {
-      submitMatterObj.name = value
-    } else if (key === 'content') {
-      submitMatterObj.content = value
-    } else if (key === 'type') {
-      submitMatterObj.typeId = value
-    } else if (key === 'priority') {
-      submitMatterObj.priority = value
-    }
-  })
-
-  if (submitMatterObj['name'] === '' || submitMatterObj['content'] === '') {
-    ElMessage.error('事项的名称和内容不能为空！')
-    return
-  }
-  if (Object.keys(props.matter).length) {
-    let {id, createTime, updateTime, isDeleted, isComplete} = props.matter
-    let {name, content, typeId, priority} = submitMatterObj
-    let params: Matter = {
-      id,
-      createTime,
-      updateTime,
-      isDeleted,
-      isComplete,
-
-      name,
-      content,
-      typeId: String(typeId),
-      priority,
-    }
-    updateMatter(params).then(value => {
-      if (value === 'success') {
+function submit() {
+  if (currDialogEditStatus()) {
+    let submitObj = getSubmitParams<{ [key: string]: string | number }>()
+    let params: { [key: string]: string | number } = {}
+    Object.keys(submitObj).forEach(key => {
+      if (props.matter[key] !== submitObj[`${key}`]) {
+        params[key] = submitObj[`${key}`]
+      }
+    })
+    postUpdateMatter(Object.assign({}, params, {id: props.matter.id})).then(res => {
+      const {code, message} = res
+      ElMessage({
+        message: message,
+        type: code === 200 ? 'success' : 'error'
+      })
+      if (code === 200) {
         handleClose()
         emit('on-callback')
-        ElMessage.success('保存成功')
-      } else {
-        ElMessage.warning('保存错误')
       }
-    }).catch(e => {
-      ElMessage.error(e.message)
     })
   } else {
-    setMatter(submitMatterObj).then(value => {
-      if (value === 'success') {
+    let submitObj = getSubmitParams<CreateMatterParams>()
+    if (submitObj['name'] === '' || submitObj['content'] === '') {
+      ElMessage.error('事项的名称和内容不能为空！')
+      return
+    }
+    postCreateMatter(submitObj).then(res => {
+      const {code, message} = res
+      ElMessage({
+        message: message,
+        type: code === 200 ? 'success' : 'error'
+      })
+      if (code === 200) {
         handleClose()
         emit('on-callback')
-        ElMessage.success('保存成功')
-      } else {
-        ElMessage.warning('保存错误')
       }
-    }).catch(e => {
-      ElMessage.error(e.message)
     })
   }
 }
 
+function currDialogEditStatus() {
+  return Object.keys(props.matter).length > 0
+}
+
+function getSubmitParams<T>(): T {
+  let submitMatterObj: T
+  submitMatterObj = Object.assign({}, ...matterFromItemList.map(item => {
+    if (item.key === 'type') {
+      return {
+        ['typeId']: item.value
+      }
+    } else {
+      return {
+        [item.key]: item.value
+      }
+    }
+  }))
+  return submitMatterObj
+}
 
 const elFormKey = ref(simpleUUID())
 watch(
@@ -217,7 +236,7 @@ watch(
       </el-form>
     </template>
     <template #footer>
-      <el-button type="primary" @click="handleAddMatter">提交</el-button>
+      <el-button type="primary" @click="submit">提交</el-button>
     </template>
   </el-dialog>
 </template>

@@ -2,13 +2,21 @@ interface BaseClass {
     id: string;
     createTime: string;
     updateTime: string;
-    isDeleted: number;
+    isDeleted?: number;
 }
 interface Matter extends BaseClass {
     name: string;
     content: string;
     typeId?: string,
     priority?: number,
+    isComplete: number;
+}
+
+interface ResponseMatter extends BaseClass {
+    name: string;
+    content: string;
+    typeId?: string,
+    priority: number,
     isComplete: number;
 }
 
@@ -38,7 +46,7 @@ export {
     Matter,
     MatterType,
     MatterTypeGrade,
-
+    ResponseMatter,
 
     MatterFrom,
 }

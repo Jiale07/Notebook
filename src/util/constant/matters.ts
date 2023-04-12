@@ -23,7 +23,7 @@ const MatterSaveModeKey = {
     [MattersSaveMode.BackendStorage]: 'BackendStorage',
 }
 
-const SortValue = {
+const MatterSortValue = {
     First: 1,
     Second: 2,
     Third: 3,
@@ -31,75 +31,31 @@ const SortValue = {
     Fifth: 5,
 }
 
-// 事项类型临时性使用常量的形式进行配置。
-const MatterTypeList: Array<MatterType> = [
-    {
-        id: '10001',
-        name: '重要且紧急',
-        sortValue: SortValue.First,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10002',
-        name: '重要不紧急',
-        sortValue: SortValue.Second,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10003',
-        name: '不重要但紧急',
-        sortValue: SortValue.Third,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10004',
-        name: '不重要不紧急',
-        sortValue: SortValue.Fourth,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    },
-    {
-        id: '10005',
-        name: '未分类',
-        sortValue: SortValue.Fourth,
-        createTime: '1679277514036',
-        updateTime: '1679277514036',
-        isDeleted: 0
-    }
-].filter(item => item.isDeleted === 0)
-
 const MatterSortValueList = [
     {
         key: 'first',
         label: '最高',
-        value: SortValue.First
+        value: MatterSortValue.First
     },
     {
         key: 'second',
         label: '高',
-        value: SortValue.Second
+        value: MatterSortValue.Second
     },
     {
         key: 'third',
         label: '中',
-        value: SortValue.Third
+        value: MatterSortValue.Third
     },
     {
         key: 'fourth',
         label: '低',
-        value: SortValue.Fourth
+        value: MatterSortValue.Fourth
     },
     {
         key: 'fifth',
         label: '最低',
-        value: SortValue.Fifth
+        value: MatterSortValue.Fifth
     }
 ]
 
@@ -111,6 +67,7 @@ export {
     MattersSaveModeName,
     MatterSaveModeKey,
 
-    MatterTypeList,
+    // MatterTypeList,
     MatterSortValueList,
+    MatterSortValue
 }

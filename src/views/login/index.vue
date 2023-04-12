@@ -13,8 +13,7 @@ const ruleFrom = reactive({
 function onLogin() {
   let {phone, password} = ruleFrom
   return login({phone, password}).then(res => {
-    let {code, message} = res.data
-    console.log('code === 200', code === 200)
+    let {code, message} = res
     if (code === 200) {
       router.push('/')
     } else {
