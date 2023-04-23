@@ -10,7 +10,7 @@ module.exports = defineConfig({
       port: 3000,
       proxy: {
         '/notebookApi': {
-          target: `http://localhost:8080/`, pathRewrite: {'^/notebookApi': ''},
+          target: `http://121.37.236.195:8080/`, pathRewrite: {'^/notebookApi': ''},
         }
       }
     },
