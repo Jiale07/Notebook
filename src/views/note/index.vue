@@ -3,11 +3,13 @@
 </script>
 
 <template>
-  <div>
-    node
+  <div class="body">
+    <div class="container">
+      node
+    </div>
   </div>
 </template>
 
-<style scoped>
-
+<style scoped lang="scss">
+@import "src/assets/styles/public.scss";
 </style>

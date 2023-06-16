@@ -25,11 +25,6 @@ function handleSelect(index: string): void {
   }
 }
 
-let scrollHeight = ref((() => {
-  return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-})())
-
-
 const userAboutButtonList = [
   {
     key: 'logout',
@@ -55,7 +50,7 @@ function toSetting() {
 </script>
 
 <template>
-  <div class="home-box" :style="{minHeight: `${scrollHeight}px`}">
+  <div class="home-box">
     <div class="menu-box">
       <el-menu
           :default-active="activeIndex"
@@ -101,6 +96,7 @@ function toSetting() {
 
 <style scoped lang="scss">
 .home-box {
+  height: 100%;
   display: flex;
   flex-direction: column;
 

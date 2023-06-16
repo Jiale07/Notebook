@@ -3,9 +3,9 @@ import {ResponseMatter} from "@/util/interface/matter";
 import {Result} from '@/util/interface/result'
 
 const matterApi = '/matter'
-interface submitMatter {
-    name: string
-}
+// interface submitMatter {
+//     name: string
+// }
 interface GetMatterListParams {
     matterTypeId: string
 }

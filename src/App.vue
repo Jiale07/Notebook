@@ -1,5 +1,7 @@
 <template>
-  <router-view ></router-view>
+  <div class="main-body">
+    <router-view ></router-view>
+  </div>
 </template>
 
 <style lang="scss">
@@ -10,6 +12,10 @@
 
 #app {
   background-color: #f1f4f9;
+}
+
+.main-body {
+  height: 100vh;
 }
 </style>
 

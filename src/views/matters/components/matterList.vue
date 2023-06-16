@@ -49,7 +49,7 @@ function handleClick(matter: Matter) {
     align-items: center;
     font-size: 16px;
     background-color: #ffffff;
-    border-radius: 15px;
+    border-radius: 30px;
     border: 1px solid #039BD2;
 
     .content-box {

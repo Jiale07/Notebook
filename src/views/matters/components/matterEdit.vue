@@ -64,7 +64,7 @@ async function initTabList() {
   return await getMatterTypeList().then(res => {
     let {code, data, message} = res
     if (code === 200) {
-      matterTypeList = data
+      matterTypeList = data.sort((curr, next) => curr.sortValue - next.sortValue)
       matterFromItemList.find(item => item.key === 'type')?.options?.push(...formatOptions(matterTypeList))
     } else {
       ElMessage.warning(message)
@@ -206,10 +206,12 @@ watch(
 <template>
   <el-dialog
       v-model="dialogVisible"
-      title="添加事项"
       width="30%"
       :before-close="handleClose"
   >
+    <template #header>
+      添加事项
+    </template>
     <template #default>
       <el-form :model="matterFrom" :key="elFormKey">
         <el-form-item
@@ -241,6 +243,6 @@ watch(
   </el-dialog>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

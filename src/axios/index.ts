@@ -1,7 +1,8 @@
-import axios, {AxiosResponse} from 'axios'
+import axios from 'axios'
 
 
 const service = axios.create({
+    // baseURL: 'http://121.37.236.195:8080/',
     baseURL: '/notebookApi',
     timeout: 5000,
 })
@@ -18,7 +19,7 @@ service.interceptors.request.use(config => {
 
 
 service.interceptors.response.use(response => {
-    const token = response.headers.authorization
+    const token = response.data.data?.authorization
     if (token) {
         sessionStorage.setItem('token', token)
     }

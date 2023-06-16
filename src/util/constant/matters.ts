@@ -1,5 +1,4 @@
 const MatterSettingInfoSaveKey = 'matter-setting-info'
-import {MatterType} from '@/util/interface/matter'
 const MattersSaveKey = 'matters'
 
 const MatterSettingInfoKeys = {
