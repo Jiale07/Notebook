@@ -5,6 +5,10 @@ const props = defineProps({
   matterList: {
     type: Array,
     default: () => []
+  },
+  matterLoading: {
+    type: Boolean,
+    default: false,
   }
 })
 
@@ -14,28 +18,40 @@ function handleDeleteMatter(id: string) {
   emit('on-deleteMatter', id)
 }
 function handleClick(matter: Matter) {
-  emit('on-click', matter)
+  if (matter.isComplete === 0) {
+    emit('on-click', matter)
+  }
 }
 </script>
 
 <template>
   <div class="matter-list-box">
     <slot name="header"></slot>
-    <div v-if="matterList?.length">
-      <div class="matters-item" v-for="(item, index) in props.matterList" :key="`matter-${index}}`">
-        <svg-icon
-            icon-class="circle"
-            class-name="svg-icon"
-            @click="handleDeleteMatter(item.id)"
-        ></svg-icon>
-        <div class="content-box" @click="handleClick(item)">
-          <span class="content">{{ item.content }}</span>
+    <el-skeleton :loading="matterLoading" :rows="5" animated>
+      <template #template>
+        <div v-for="item in 3" :key="`skeleton-${item}`" class="skeleton-item">
+          <el-skeleton-item/>
         </div>
-      </div>
-    </div>
-    <div v-else>
-      <span>暂无更多......</span>
-    </div>
+      </template>
+      <template #default>
+        <div v-if="matterList?.length">
+          <div class="matters-item" v-for="(item, index) in props.matterList" :key="`matter-${index}}`"  @click="handleClick(item)">
+            <svg-icon
+                v-if="item.isComplete === 0"
+                icon-class="circle"
+                class-name="svg-icon"
+                @click.stop="handleDeleteMatter(item.id)"
+            ></svg-icon>
+            <div class="content-box">
+              <span class="content">{{ item.content }}</span>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <span>暂无更多......</span>
+        </div>
+      </template>
+    </el-skeleton>
   </div>
 </template>
 
@@ -72,5 +88,15 @@ function handleClick(matter: Matter) {
 .svg-icon {
   width: 30px;
   height: 30px;
+}
+
+.skeleton-item {
+
+  .el-skeleton__item {
+    margin-top: 10px;
+    height: 30px;
+    padding: 10px 0;
+    border-radius: 30px;
+  }
 }
 </style>

@@ -7,7 +7,8 @@ const matterApi = '/matter'
 //     name: string
 // }
 interface GetMatterListParams {
-    matterTypeId: string
+    matterTypeId?: string
+    isComplete?: number
 }
 interface FinishMatterParams {
     id: string

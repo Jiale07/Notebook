@@ -3,7 +3,7 @@ import {
   Edit,
   Setting
 } from '@element-plus/icons-vue'
-import MatterListItem from "@/views/matters/components/matterList.vue";
+import MatterListComponent from "@/views/matters/components/matterList.vue";
 import {ref, reactive, onMounted} from 'vue'
 import MatterSetting from "@/views/matters/components/matterSetting.vue";
 import MatterEdit from "@/views/matters/components/matterEdit.vue";
@@ -19,6 +19,7 @@ const tabKey = ref(simpleUUID())
 const currTypeId = ref<string>('')
 
 async function initTabList() {
+  tabLoading.value = true
   await getMatterTypeList().then(res => {
     let {code, data, message} = res
     if (code === 200 || code === 304) {
@@ -29,11 +30,18 @@ async function initTabList() {
         updateTime: '',
         name: '未分类',
         sortValue: 0
+      },{
+        id: 'complete',
+        createTime: '',
+        updateTime: '',
+        name: '已完成',
+        sortValue: 0
       })
     } else {
       ElMessage.warning(message)
     }
   }).finally(() => {
+    tabLoading.value = false
     tabKey.value = simpleUUID()
   })
   if (tabList.length) {
@@ -48,8 +56,13 @@ onMounted(async () => {
 
 function handleTabClick(index: number) {
   let {id} = tabList[index]
-  currTypeId.value = id
-  initMatterList(currTypeId.value)
+
+  if (id === 'complete') {
+    initMatterList(undefined, 1)
+  } else {
+    currTypeId.value = id
+    initMatterList(currTypeId.value)
+  }
 }
 
 let listKey = ref(simpleUUID())
@@ -77,8 +90,9 @@ function handleChangeSettingVisible() {
   settingDialogVisible.value = false
 }
 
-function initMatterList(typeId: string) {
-  return getMatterList({matterTypeId: typeId}).then(res => {
+function initMatterList(typeId?: string, isComplete?: number) {
+  matterLoading.value = true
+  return getMatterList({matterTypeId: typeId, isComplete}).then(res => {
     let {code, data, message} = res
     if (code === 200 || code === 304) {
       matterList = data.map(item => {
@@ -94,6 +108,7 @@ function initMatterList(typeId: string) {
       ElMessage.warning(message)
     }
   }).finally(() => {
+    matterLoading.value = false
     listKey.value = simpleUUID()
   })
 }
@@ -125,30 +140,32 @@ function handleRowOnClick(matter: MatterInterface) {
   editDialogVisible.value = true
 }
 
-// 列表展示
+const matterLoading = ref(false)
+const tabLoading = ref(false)
 </script>
 
 <template>
   <div class="body">
-    <div class="container matters-box">
+    <div class="container matters-box" v-loading="tabLoading">
       <el-tabs @tab-change="handleTabClick($event)">
         <el-tab-pane
             v-for="item in tabList"
             :key="item.id"
             :label="item.name"
         >
-          <MatterListItem
+          <MatterListComponent
               :key="listKey"
               :matter-list="matterList"
               @on-delete-matter="handleDeleteMatter"
               @on-click="handleRowOnClick"
               class="matter-list-item"
+              :matterLoading="matterLoading"
           >
             <template v-slot:header>
               <div class="header">
                 <div class="title-box">
                   <span>
-                    代办事项
+                    事项
                   </span>
                 </div>
                 <div class="button-list">
@@ -157,10 +174,9 @@ function handleRowOnClick(matter: MatterInterface) {
                 </div>
               </div>
             </template>
-          </MatterListItem>
-        </el-tab-pane>
+          </MatterListComponent>
+          </el-tab-pane>
       </el-tabs>
-
       <MatterEdit
           v-model:visible="editDialogVisible"
           :matter="editMatter"
