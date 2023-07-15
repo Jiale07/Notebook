@@ -15,6 +15,7 @@
 }
 
 .main-body {
+  display: flex;
   min-height: 100vh;
 }
 </style>

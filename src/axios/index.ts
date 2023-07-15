@@ -2,8 +2,8 @@ import axios from 'axios'
 
 
 const service = axios.create({
-    baseURL: '/notebookApi',
-    // baseURL: '/localhost',
+    // baseURL: '/notebookApi',
+    baseURL: '/localhost',
     timeout: 5000,
 })
 

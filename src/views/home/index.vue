@@ -96,7 +96,7 @@ function toSetting() {
 
 <style scoped lang="scss">
 .home-box {
-  height: 100%;
+  flex: 1; // 与app.vue中的main-body的flex布局先对应
   display: flex;
   flex-direction: column;
 
