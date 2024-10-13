@@ -298,7 +298,7 @@ function handleSubmitFolderInfo() {
 @import "src/assets/styles/public.scss";
 
 .node-box {
-  min-width: 1920px;
+  //min-width: 1920px;
   display: flex;
 
   .node-container {

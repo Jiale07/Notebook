@@ -193,7 +193,7 @@ const tabLoading = ref(false)
 @import "src/assets/styles/public.scss";
 
 .matters-box {
-  min-width: 1920px;
+  //min-width: 1920px;
 
   .matter-list-box {
 

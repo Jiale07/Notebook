@@ -3,9 +3,8 @@ import remainingRouter from "@/router/modules/remaining";
 import {SessionStorage} from "@/util/storageTool"
 import home from "@/router/modules/home";
 
-
 const sessionStorage = new SessionStorage()
-const allRouter = [...remainingRouter, ...home,]
+const allRouter = [...remainingRouter, ...home]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: allRouter

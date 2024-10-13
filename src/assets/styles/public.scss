@@ -2,13 +2,15 @@
   height: 100%;
   display: flex;
   justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
 
   .container {
-    min-width: 1920px;
+    width: 100%;
     padding: 10px;
+    box-sizing: border-box;
     border-radius: 15px;
     background-color: #ffffff;
-    margin: 10px 0;
   }
 }
 

@@ -4,7 +4,7 @@ import {Result} from '@/util/interface/result'
 const userApi = '/user'
 
 interface LoginFrom {
-    phone: string,
+    account: string,
     password: string,
 }
 interface UserInfo {

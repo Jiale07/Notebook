@@ -5,14 +5,14 @@ import { ElMessage } from "element-plus";
 import {login} from "@/axios/modules/user";
 
 const ruleFrom = reactive({
-  phone: '18812341234',
+  account: 'admin',
   password: '123456',
 })
 
 
 function onLogin() {
-  let {phone, password} = ruleFrom
-  return login({phone, password}).then(res => {
+  let {account, password} = ruleFrom
+  return login({account, password}).then(res => {
     let {code, message} = res
     if (code === 200) {
       router.push('/')
@@ -23,7 +23,6 @@ function onLogin() {
     ElMessage.error(err || '登录失败，请稍后重试')
   })
 }
-
 </script>
 
 <template>
@@ -37,7 +36,7 @@ function onLogin() {
             <el-input
               clearable
               placeholder="Please enter the user name"
-              v-model.trim="ruleFrom.phone"
+              v-model.trim="ruleFrom.account"
             >
             </el-input>
           </el-form-item>
@@ -60,6 +59,7 @@ function onLogin() {
 
 <style scoped lang="scss">
 .login-container {
+  width: 100%;
   display: flex;
   justify-content: space-around;
 }

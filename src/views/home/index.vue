@@ -13,6 +13,10 @@ const navList = reactive([
     key: 'Note',
     index: '2',
     title: '笔记'
+  },{
+    key: 'Bill',
+    index: '3',
+    title: '账本'
   }
 ])
 
@@ -41,7 +45,10 @@ const userAboutButtonList = [
 function logout() {
   sessionStorage.removeItem('token')
   router.push({
-    name: 'Login'
+    name: 'Login',
+    query: {
+
+    }
   })
 }
 function toSetting() {
