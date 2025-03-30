@@ -1,13 +1,63 @@
 <script setup lang="ts">
-import {getBillRecordList, updateBillRecord} from "@/axios/modules/bill";
+import {createBillRecord, getBillRecordList, updateBillRecord} from "@/axios/modules/bill";
 import {ref} from "vue";
 import {BillRecord} from '@/util/interface/billRecord'
-import {dayjs, ElMessage} from "element-plus";
+import {dayjs, ElButton, ElMessage} from "element-plus";
 import SvgIcon from "@/components/svgIcon/index.vue";
-import {ElButton, ElDialog} from 'element-plus'
 import cloneDeep from 'lodash/cloneDeep'
 import {isEmpty} from "@/util/public";
 
+// editComponentType 决定是否可以编辑
+const BaseTargetKeyList: CellItem[] = [
+  {
+    key: 'name',
+    label: '名称',
+    editComponentType: 'Input',
+  },
+  {
+    key: 'description',
+    label: '描述',
+    editComponentType: 'Input',
+  },
+  {
+    key: 'amount',
+    label: '金额',
+    editComponentType: 'InputNumber',
+  },
+  {
+    key: 'directionId',
+    label: '方向',
+    editComponentType: 'Select',
+  },
+  {
+    key: 'recipient',
+    label: '接收者',
+    editComponentType: 'Input',
+  },
+  {
+    key: 'paymentTime',
+    label: '支付时间',
+    editComponentType: 'DatePicker',
+  },
+  {
+    key: 'statusId',
+    label: '状态',
+    editComponentType: 'Switch',
+  },
+  {
+    key: 'typeId',
+    label: '类型',
+    editComponentType: 'Select',
+  },
+  {
+    key: 'createTime',
+    label: '创建时间'
+  },
+  {
+    key: 'updateTime',
+    label: '更新时间'
+  }
+]
 const billRecordList = ref<BillRecord[]>()
 
 function initPage() {
@@ -34,7 +84,6 @@ function formatBillRecordList(list: BillRecord[]) {
   })
 }
 
-const dialogVisible = ref(false)
 const dialogTitle = ref<string>('')
 const dialogCellItem = ref<CellItem[]>()
 const editBillRecord =ref<BillRecord>()
@@ -55,60 +104,7 @@ function handleToDetailPage(id: bigint) {
     editBillRecord.value = targetBillRecord || {} as BillRecord
   }
   if (!isEmpty(targetBillRecord)) {
-    let targetKeyList: CellItem[] = [
-      {
-        key: 'name',
-        label: '名称',
-        editComponentType: 'Input',
-      },
-      {
-        key: 'description',
-        label: '描述',
-        editComponentType: 'Input',
-      },
-      {
-        key: 'amount',
-        label: '金额',
-        editComponentType: 'InputNumber',
-      },
-      {
-        key: 'directionId',
-        label: '方向',
-        editComponentType: 'Select',
-      },
-      {
-        key: 'recipient',
-        label: '接收者',
-        editComponentType: 'Input',
-      },
-      {
-        key: 'paymentTime',
-        label: '支付时间',
-        editComponentType: 'TimePicker',
-      },
-      {
-        key: 'statusId',
-        label: '状态',
-        editComponentType: 'Switch',
-      },
-      {
-        key: 'typeId',
-        label: '类型',
-        editComponentType: 'Select',
-      },
-      {
-        key: 'createTime',
-        label: '创建时间'
-      },
-      {
-        key: 'updateTime',
-        label: '更新时间'
-      }
-    ]
-
-    // editComponentType 决定是否可以编辑
-
-    targetKeyList = targetKeyList.map((item) => {
+    const targetKeyList = cloneDeep(BaseTargetKeyList).map((item) => {
       const value = ((targetBillRecord as never)[item.key])
       const valueIsEmpty = isEmpty(value)
       if (item.key === 'name') {
@@ -131,7 +127,7 @@ function handleToDetailPage(id: bigint) {
       return item
     }).filter(item => !item.isHide)
     dialogCellItem.value = cloneDeep(targetKeyList)
-    dialogVisible.value = true
+    switchDrawerVisible(true)
   } else {
     ElMessage({
       message: '数据错误，请稍后重试！'
@@ -142,6 +138,7 @@ function handleToDetailPage(id: bigint) {
 function handleCloseDialog() {
   isDialogEditMode.value = false
   editCellItemList.value = []
+  editBillRecord.value = undefined
 }
 
 enum EditComponentType {
@@ -149,7 +146,7 @@ enum EditComponentType {
   InputNumber = 'InputNumber',
   Select = 'Select',
   Switch = 'Switch',
-  TimePicker = 'TimePicker',
+  DatePicker = 'DatePicker',
   Radio = 'Radio'
 }
 
@@ -196,26 +193,70 @@ function handleSubmitEdit() {
       }
       return acc
     }, {}) as BillRecord;
-    updateBillRecord(Object.assign({id: editBillRecord.value?.id}, billRecord)).then(res => {
-      const isSuccess = res.code === 200
-      if (isSuccess) {
-        isDialogEditMode.value = false
-        editCellItemList.value = []
-        dialogVisible.value = false
-        refreshBillRecordList()
-      }
-      ElMessage({
-        message: res.message,
-        type:isSuccess ? 'success' : 'warning'
+    if (editBillRecord.value?.id) {
+      updateBillRecord(Object.assign({id: editBillRecord.value?.id}, billRecord)).then(res => {
+        const isSuccess = res.code === 200
+        if (isSuccess) {
+          isDialogEditMode.value = false
+          editCellItemList.value = []
+          drawerVisible.value = false
+          refreshBillRecordList()
+        }
+        ElMessage({
+          message: res.message,
+          type:isSuccess ? 'success' : 'warning'
+        })
       })
-    })
+    } else {
+      createBillRecord(billRecord).then(res => {
+        const isSuccess = res.code === 200
+        if (isSuccess) {
+          isDialogEditMode.value = false
+          editCellItemList.value = []
+          drawerVisible.value = false
+          refreshBillRecordList()
+        }
+        ElMessage({
+          message: res.message,
+          type:isSuccess ? 'success' : 'warning'
+        })
+      })
+    }
   }
+}
+
+
+const drawerVisible = ref<boolean>(false)
+
+function switchDrawerVisible(specifiedState: boolean | undefined) {
+  if (specifiedState !== undefined) {
+    drawerVisible.value = specifiedState
+  } else {
+    drawerVisible.value = !drawerVisible.value
+  }
+}
+
+function drawerHandleClose() {
+  handleCloseDialog()
+  switchDrawerVisible(false)
+}
+
+function handleAddNewBillRecord() {
+  editCellItemList.value = cloneDeep(BaseTargetKeyList).filter(item => !isEmpty(item.editComponentType))
+  isDialogEditMode.value = true
+  switchDrawerVisible(true)
 }
 </script>
 
 <template>
   <div class="body">
     <div class="container">
+      <div class="container-header">
+        <div class="header-left">我的账单记录</div>
+        <div class="header-right">
+          <svg-icon icon-class="round_add" @click="handleAddNewBillRecord"></svg-icon>
+        </div>
+      </div>
       <div class="bill-record-item" v-for="(item, index) in billRecordList" :key="index">
         <div class="bill-record-item-left">
           <div>{{ item.name }}</div>
@@ -231,7 +272,14 @@ function handleSubmitEdit() {
         </div>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" :show-close="false" width="500" @close="handleCloseDialog">
+    <el-drawer
+        v-model="drawerVisible"
+        :direction="'btt'"
+        :before-close="drawerHandleClose"
+        :show-close="false"
+        style="border-top-left-radius: 30px !important;
+        border-top-right-radius: 30px !important;min-height: 80%;"
+    >
       <template #header="{ close }">
         <div class="dialog-header">
           <div class="dialog-title-text">{{ dialogTitle }}</div>
@@ -242,55 +290,90 @@ function handleSubmitEdit() {
         </div>
       </template>
       <template #default>
-        <div>
-          <template v-if="isDialogEditMode">
-            <div class="bill-record-info-item" v-for="cell in editCellItemList" :key="cell.key">
-              <div>{{ cell.label }}:</div>
-              <div>
-                <template v-if="cell.editComponentType === EditComponentType.Select">
-                  <el-select
-                      v-model="cell.value"
-                      placeholder="Select"
-                      size="large"
-                      style="width: 240px"
-                  >
-                    <el-option
-                        v-for="item in directionIdOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
+        <template v-if="isDialogEditMode">
+          <div class="edit-content-box">
+            <div class="edit-content">
+              <div class="bill-record-info-item" v-for="cell in editCellItemList" :key="cell.key">
+                <div>{{ cell.label }}:</div>
+                <div>
+                  <template v-if="cell.editComponentType === EditComponentType.Select">
+                    <el-select
+                        v-model="cell.value"
+                        placeholder="Select"
+                        size="default"
+                        style="width: 240px"
+                    >
+                      <el-option
+                          v-for="item in directionIdOptions"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                      />
+                    </el-select>
+                  </template>
+                  <template v-else-if="cell.editComponentType === EditComponentType.Input">
+                    <el-input style="width: 240px" v-model="cell.value"></el-input>
+                  </template>
+                  <template v-else-if="cell.editComponentType === EditComponentType.InputNumber">
+                    <el-input-number style="width: 240px" v-model="cell.value" :precision="2" :step="0.1" />
+                  </template>
+                  <template v-else-if="cell.editComponentType === EditComponentType.DatePicker">
+                    <el-date-picker
+                        style="width: 240px"
+                        v-model="cell.value"
+                        type="datetime"
+                        placeholder="请选择"
+                        format="YYYY/MM/DD HH:mm:ss"
+                        value-format="YYYY/MM/DD HH:mm:ss"
+                        data-format="YYYY/MM/DD HH:mm:ss"
+                        editable
                     />
-                  </el-select>
-                </template>
-                <template v-else-if="cell.editComponentType === EditComponentType.Input">
-                  <el-input style="width: 240px" v-model="cell.value"></el-input>
-                </template>
-                <template v-else-if="cell.editComponentType === EditComponentType.InputNumber">
-                  <el-input-number style="width: 240px" v-model="cell.value" :precision="2" :step="0.1" />
-                </template>
-                <template v-else>
-                  <div>{{ cell.showValue }}</div>
-                </template>
+                  </template>
+                  <template v-else-if="cell.editComponentType === EditComponentType.Switch">
+                    <el-switch
+                        v-model="cell.value"
+                        size="large"
+                        active-text="Open"
+                        inactive-text="Close"
+                    />
+                  </template>
+                  <template v-else>
+                    <div>{{ cell.showValue }}</div>
+                  </template>
+                </div>
               </div>
             </div>
             <div class="dialog-button-group">
-              <el-button type="primary" @click="handleSubmitEdit">提交</el-button>
+              <el-button class="submit-class" type="primary" @click="handleSubmitEdit">提交</el-button>
             </div>
-          </template>
-          <template v-else>
-            <div class="bill-record-info-item" v-for="cell in dialogCellItem" :key="cell.key">
-              <div>{{ cell.label }}:</div>
-              <div>{{ cell.showValue }}</div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="edit-content-box">
+            <div class="edit-content">
+              <div class="bill-record-info-item" v-for="cell in dialogCellItem" :key="cell.key">
+                <div>{{ cell.label }}:</div>
+                <div>{{ cell.showValue }}</div>
+              </div>
             </div>
-          </template>
-        </div>
+          </div>
+        </template>
       </template>
-    </el-dialog>
+    </el-drawer>
   </div>
 </template>
 
 <style scoped lang="scss">
 @import "src/assets/styles/public.scss";
+
+
+.container-header {
+  padding: 10px 0;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 .bill-record-item {
   width: 100%;
@@ -331,8 +414,13 @@ function handleSubmitEdit() {
 }
 
 .dialog-button-group {
+  width: 100%;
   display: flex;
   justify-content: flex-end;
+
+  .submit-class {
+    width: 100%;
+  }
 }
 
 .svg-icon {
@@ -341,14 +429,27 @@ function handleSubmitEdit() {
   cursor: pointer; // 小手
 }
 
-.bill-record-info-item {
+.edit-content-box {
   display: flex;
-  justify-content: space-between;
-  white-space: nowrap;
-  align-items: center;
+  flex-direction: column;
+  height: 100%;
+
+  .edit-content {
+    flex: 1;
+
+    .bill-record-info-item {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      white-space: nowrap;
+      align-items: center;
+    }
+
+    .bill-record-info-item:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  }
 }
 
-.bill-record-info-item:not(:last-child) {
-  margin-bottom: 10px;
-}
+
 </style>

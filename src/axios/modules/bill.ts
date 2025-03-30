@@ -17,7 +17,16 @@ function updateBillRecord(data: BillRecord): Promise<Result<object>> {
         data,
     })
 }
+
+function createBillRecord(data: BillRecord): Promise<Result<object>> {
+    return request({
+        url: `${billApiBase}/createBillRecord`,
+        method: 'post',
+        data,
+    })
+}
 export {
     getBillRecordList,
-    updateBillRecord
+    updateBillRecord,
+    createBillRecord
 }
