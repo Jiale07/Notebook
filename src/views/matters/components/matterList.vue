@@ -18,9 +18,7 @@ function handleDeleteMatter(id: string) {
   emit('on-deleteMatter', id)
 }
 function handleClick(matter: Matter) {
-  if (matter.isComplete === 0) {
-    emit('on-click', matter)
-  }
+  emit('on-click', matter)
 }
 </script>
 
@@ -43,7 +41,12 @@ function handleClick(matter: Matter) {
                 @click.stop="handleDeleteMatter(item.id)"
             ></svg-icon>
             <div class="content-box">
-              <span class="content">{{ item.content }}</span>
+              <div>
+                <span style="" class="name">{{ item.name }}</span>
+              </div>
+              <div>
+                <span class="content">{{ item.content }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -74,6 +77,15 @@ function handleClick(matter: Matter) {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      .name {
+        font-weight: 500;
+        //font-size: 20px;
+      }
+
+      .content{
+        color: #999999;
+      }
     }
   }
 

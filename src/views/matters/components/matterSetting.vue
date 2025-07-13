@@ -66,18 +66,21 @@ const settingList = reactive<Array<SettingListObj>>([
 </script>
 
 <template>
-  <el-dialog
+  <el-drawer
       v-model="dialogVisible"
       title="Tips"
-      width="30%"
       :before-close="handleClose"
+      :direction="'btt'"
+      :size="'61.8%'"
+      style="border-top-left-radius: 30px !important;
+        border-top-right-radius: 30px !important;min-height: 80%;"
   >
     <template #default>
       <div v-for="settingItem in settingList" :key="`setting-${settingItem.key}`" class="setting-item">
-        <div class="setting-item-label">
+        <div class="setting-item-label ellipsis">
           <span>{{ settingItem.label }}</span>
         </div>
-        <el-select v-model="settingItem.value" class="m-2" placeholder="Select" size="large">
+        <el-select v-model="settingItem.value" class="m-2" placeholder="Select" size="large" style="flex: 1">
           <el-option
               v-for="item in settingItem.options"
               :key="item.value"
@@ -87,7 +90,7 @@ const settingList = reactive<Array<SettingListObj>>([
         </el-select>
       </div>
     </template>
-  </el-dialog>
+  </el-drawer>
 </template>
 
 <style scoped lang="scss">
@@ -101,4 +104,9 @@ const settingList = reactive<Array<SettingListObj>>([
   }
 }
 
+.ellipsis {
+  white-space: nowrap;      /* 禁止换行 */
+  overflow: hidden;        /* 超出部分隐藏 */
+  text-overflow: ellipsis; /* 显示省略号 */
+}
 </style>

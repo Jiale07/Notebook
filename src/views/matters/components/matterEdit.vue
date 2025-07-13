@@ -5,7 +5,7 @@ import {MatterSortValue, MatterSortValueList} from "@/util/constant/matters";
 import {MatterType} from "@/util/interface/matter";
 import {simpleUUID} from "@/util/uuid";
 import {getMatterTypeList} from "@/axios/modules/matterType";
-import {postCreateMatter, postUpdateMatter} from "@/axios/modules/matter";
+import {postCreateMatter, postUpdateMatter, restoreFinishMatter} from "@/axios/modules/matter";
 
 const props = defineProps({
   visible: {
@@ -16,6 +16,10 @@ const props = defineProps({
     type: Object,
     default: () => {
     }
+  },
+  edit: {
+    type: Boolean,
+    default: false,
   }
 })
 const dialogVisible = ref(false)
@@ -59,7 +63,9 @@ interface Options {
   label: string,
   value: string | number
 }
-let matterTypeList:MatterType[] = []
+
+let matterTypeList: MatterType[] = []
+
 async function initTabList() {
   return await getMatterTypeList().then(res => {
     let {code, data, message} = res
@@ -73,6 +79,7 @@ async function initTabList() {
 
   )
 }
+
 onMounted(async () => {
   await initTabList()
 })
@@ -86,6 +93,7 @@ function formatOptions(list: Array<MatterType>): Array<Options> {
     }
   })
 }
+
 let matterFromItemList = reactive<Array<MatterFromItem>>([
   {
     key: 'name',
@@ -112,48 +120,67 @@ let matterFromItemList = reactive<Array<MatterFromItem>>([
     options: MatterSortValueList
   }
 ])
+
 interface CreateMatterParams {
   name: string,
   content: string,
   typeId?: number,
   priority?: number,
 }
+
 const matterFrom: MatterFrom = emptyMatter
+
 function submit() {
-  if (currDialogEditStatus()) {
-    let submitObj = getSubmitParams<{ [key: string]: string | number }>()
-    let params: { [key: string]: string | number } = {}
-    Object.keys(submitObj).forEach(key => {
-      if (props.matter[key] !== submitObj[`${key}`]) {
-        params[key] = submitObj[`${key}`]
-      }
-    })
-    postUpdateMatter(Object.assign({}, params, {id: props.matter.id})).then(res => {
-      const {code, message} = res
-      ElMessage({
-        message: message,
-        type: code === 200 ? 'success' : 'error'
+  if (props.edit) {
+    // 编辑
+    if (currDialogEditStatus()) {
+      let submitObj = getSubmitParams<{ [key: string]: string | number }>()
+      let params: { [key: string]: string | number } = {}
+      Object.keys(submitObj).forEach(key => {
+        if (props.matter[key] !== submitObj[`${key}`]) {
+          params[key] = submitObj[`${key}`]
+        }
       })
-      if (code === 200) {
-        handleClose()
-        emit('on-callback')
+      postUpdateMatter(Object.assign({}, params, {id: props.matter.id})).then(res => {
+        const {code, message} = res
+        ElMessage({
+          message: message,
+          type: code === 200 ? 'success' : 'error'
+        })
+        if (code === 200) {
+          handleClose()
+          emit('on-callback')
+        }
+      })
+    } else {
+      let submitObj = getSubmitParams<CreateMatterParams>()
+      if (submitObj['name'] === '' || submitObj['content'] === '') {
+        ElMessage.error('事项的名称和内容不能为空！')
+        return
       }
-    })
-  } else {
-    let submitObj = getSubmitParams<CreateMatterParams>()
-    if (submitObj['name'] === '' || submitObj['content'] === '') {
-      ElMessage.error('事项的名称和内容不能为空！')
-      return
+      postCreateMatter(submitObj).then(res => {
+        const {code, message} = res
+        ElMessage({
+          message: message,
+          type: code === 200 ? 'success' : 'error'
+        })
+        if (code === 200) {
+          handleClose()
+          emit('on-callback')
+        }
+      })
     }
-    postCreateMatter(submitObj).then(res => {
+  } else {
+    //  恢复
+    restoreFinishMatter({id: props.matter.id}).then(res => {
       const {code, message} = res
       ElMessage({
         message: message,
-        type: code === 200 ? 'success' : 'error'
+        type: code === 200 || code === 304 ? 'success' : 'error'
       })
       if (code === 200) {
         handleClose()
-        emit('on-callback')
+        emit('on-callback', {isComplete: true})
       }
     })
   }
@@ -187,7 +214,7 @@ watch(
         matterFromItemList = reactive(matterFromItemList.map(item => {
           return {
             ...item,
-            value: item.key === 'type'? value['typeId'] : value[item.key]
+            value: item.key === 'type' ? value['typeId'] : value[item.key]
           }
         }))
       } else {
@@ -204,45 +231,52 @@ watch(
 </script>
 
 <template>
-  <el-dialog
+  <el-drawer
       v-model="dialogVisible"
-      width="30%"
       :before-close="handleClose"
+      :direction="'btt'"
+      :size="'61.8%'"
+      :title="'添加事项'"
+      style="border-top-left-radius: 30px !important;
+        border-top-right-radius: 30px !important;min-height: 80%;"
   >
-    <template #header>
-      添加事项
-    </template>
     <template #default>
-      <el-form :model="matterFrom" :key="elFormKey">
-        <el-form-item
-            v-for="(item) in matterFromItemList"
-            :key="`from-item-${item.key}`"
-            :label="item.label"
-        >
-          <el-input v-if="['name', 'content'].includes(item.key)" v-model="item.value"></el-input>
-          <el-select
-              v-else-if="['type', 'priority'].includes(item.key)"
-              v-model="item.value"
-              class="m-2"
-              placeholder="请选择"
-              size="large"
+      <div class="default-body">
+        <el-form :model="matterFrom" :key="elFormKey">
+          <el-form-item
+              v-for="(item) in matterFromItemList"
+              :key="`from-item-${item.key}`"
+              :label="item.label"
           >
-            <el-option
-                v-for="item in item.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
+            <el-input v-if="['name', 'content'].includes(item.key)" :disabled="!edit" v-model="item.value"></el-input>
+            <el-select
+                v-else-if="['type', 'priority'].includes(item.key)"
+                v-model="item.value"
+                class="m-2"
+                placeholder="请选择"
+                size="large"
+                :disabled="!edit"
+            >
+              <el-option
+                  v-for="item in item.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
     </template>
     <template #footer>
-      <el-button type="primary" @click="submit">提交</el-button>
+      <el-button type="primary" @click="submit">{{ edit ? '提交' : '恢复' }}</el-button>
     </template>
-  </el-dialog>
+  </el-drawer>
 </template>
 
 <style scoped lang="scss">
-
+.default-body {
+  width: 100%;
+  height: 100%;
+}
 </style>

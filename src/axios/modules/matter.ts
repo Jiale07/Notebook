@@ -67,6 +67,14 @@ export function finishMatter(params: FinishMatterParams): Promise<Result<unknown
     })
 }
 
+export function restoreFinishMatter(params: FinishMatterParams): Promise<Result<unknown>> {
+    return request({
+        url: `${matterApi}/postRestoreFinishMatter`,
+        method: 'post',
+        params,
+    })
+}
+
 export function postShiftDeleteMatter(params: object) {
     return request({
         url: `${matterApi}/postShiftDeleteMatter`,

@@ -277,6 +277,7 @@ function handleAddNewBillRecord() {
         :direction="'btt'"
         :before-close="drawerHandleClose"
         :show-close="false"
+        :size="'61.8%'"
         style="border-top-left-radius: 30px !important;
         border-top-right-radius: 30px !important;min-height: 80%;"
     >

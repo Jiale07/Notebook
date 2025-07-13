@@ -6,26 +6,27 @@ import {ElMessage} from "element-plus";
 const navList = reactive([
   {
     key: 'Matters',
-    index: '1',
     title: '事项',
+    isHide: false,
   },
   {
     key: 'Note',
-    index: '2',
-    title: '笔记'
+    title: '笔记',
+    isHide: true,
   },{
     key: 'Bill',
-    index: '3',
-    title: '账本'
+    title: '账本',
+    isHide: false,
   }
-])
+].filter(item => !item.isHide))
 
 // 切换菜单
-let activeIndex = ref('0') // 菜单默认选中项
+let activeIndex = ref(navList[0].key) // 菜单默认选中项
 function handleSelect(index: string): void {
-  if (activeIndex.value !== index) {
+  const targetNav =  navList.find((item) => item.key === index)
+  if (targetNav) {
     activeIndex.value = index
-    router.push({name: `${navList[Number(index) - 1].key}`})
+    router.push({name: `${targetNav.key}`})
   }
 }
 
@@ -68,7 +69,7 @@ function toSetting() {
         <el-menu-item
             v-for="(item, index) in navList"
             :key="`${item.key}-${index}`"
-            :index="item.index"
+            :index="item.key"
         >{{ item.title }}
         </el-menu-item>
       </el-menu>

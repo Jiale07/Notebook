@@ -67,15 +67,18 @@ function handleTabClick(index: number) {
 
 let listKey = ref(simpleUUID())
 
-const editDialogVisible = ref(false)
+const editDrawerVisible = ref(false)
+const editDrawerCanEdit = ref(false)
 
 function handleAddMatter() {
-  editDialogVisible.value = true
+  editDrawerVisible.value = true
+  editDrawerCanEdit.value = true
   editMatter.value = {}
 }
 
-function handleEditDialogVisible() {
-  editDialogVisible.value = false
+function handleEditDrawerVisible() {
+  editDrawerVisible.value = false
+  editDrawerCanEdit.value = false
 }
 
 
@@ -108,7 +111,9 @@ function initMatterList(typeId?: string, isComplete?: number) {
       ElMessage.warning(message)
     }
   }).finally(() => {
-    matterLoading.value = false
+    setTimeout(() => {
+      matterLoading.value = false
+    }, 250)
     listKey.value = simpleUUID()
   })
 }
@@ -116,8 +121,8 @@ function initMatterList(typeId?: string, isComplete?: number) {
 
 let editDialogKey = ref(simpleUUID())
 
-function handleCallback() {
-  initMatterList(currTypeId.value)
+function handleCallback(event: any) {
+  initMatterList(currTypeId.value, event.isComplete ? 1 : 0)
   editDialogKey.value = simpleUUID()
 }
 
@@ -136,8 +141,15 @@ function handleDeleteMatter(id: string) {
 let editMatter = ref({})
 
 function handleRowOnClick(matter: MatterInterface) {
-  editMatter.value = matter
-  editDialogVisible.value = true
+  if(matter.isComplete === 0) {
+    editMatter.value = matter
+    editDrawerCanEdit.value = true
+    editDrawerVisible.value = true
+  } else {
+    editMatter.value = matter
+    editDrawerCanEdit.value = false
+    editDrawerVisible.value = true
+  }
 }
 
 const matterLoading = ref(false)
@@ -178,9 +190,10 @@ const tabLoading = ref(false)
           </el-tab-pane>
       </el-tabs>
       <MatterEdit
-          v-model:visible="editDialogVisible"
+          v-model:visible="editDrawerVisible"
           :matter="editMatter"
-          @on-close="handleEditDialogVisible"
+          :edit="editDrawerCanEdit"
+          @on-close="handleEditDrawerVisible"
           @on-callback="handleCallback"
           :key="editDialogKey"
       ></MatterEdit>
