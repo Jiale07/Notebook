@@ -8,7 +8,7 @@ function resolve(dir) {
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
-    host: '192.168.3.4',
+    host: '192.168.31.170',
     port: 3000,
     proxy: {
       '/notebookApi': {
@@ -17,7 +17,7 @@ module.exports = defineConfig({
         pathRewrite: {'^/notebookApi': ''},
       },
       '/localhost': {
-        target: `http://192.168.3.4:8080`,
+        target: `http://localhost:8080`,
         changeOrigin: true,
         pathRewrite: {'^/localhost': ''},
       },

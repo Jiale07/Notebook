@@ -67,7 +67,6 @@ function handleClick(matter: Matter) {
     display: flex;
     align-items: center;
     font-size: 16px;
-    background-color: #ffffff;
     border-radius: 30px;
     border: 1px solid #039BD2;
 

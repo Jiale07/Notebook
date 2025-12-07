@@ -33,5 +33,7 @@ let svgClass = () => {
 </template>
 
 <style scoped>
-
+.svg-icon {
+  fill: currentColor;     /* 关键！让 SVG 填充色等于文字颜色  同时要求svg文件不要填充fill颜色 */
+}
 </style>

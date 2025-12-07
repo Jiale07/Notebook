@@ -5,14 +5,23 @@
 </template>
 
 <style lang="scss">
+@import '/src/styles/theme.scss';
+
 *{
   margin: 0;
   padding: 0;
 }
+.main-body {
+  //background-color: var(--bg-primary);
 
-#app {
-  background-color: #f1f4f9;
 }
+
+//@media (prefers-color-scheme: dark) {
+//  #app {
+//    background-color: #121212;
+//  }
+//}
+
 
 .main-body {
   display: flex;

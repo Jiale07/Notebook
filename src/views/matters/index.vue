@@ -122,7 +122,7 @@ function initMatterList(typeId?: string, isComplete?: number) {
 let editDialogKey = ref(simpleUUID())
 
 function handleCallback(event: any) {
-  initMatterList(currTypeId.value, event.isComplete ? 1 : 0)
+  initMatterList(currTypeId.value, event && event.isComplete ? 1 : 0)
   editDialogKey.value = simpleUUID()
 }
 
@@ -206,7 +206,8 @@ const tabLoading = ref(false)
 @import "src/assets/styles/public.scss";
 
 .matters-box {
-  //min-width: 1920px;
+  max-width: 1200px;
+  background-color: var(--card-bg);
 
   .matter-list-box {
 

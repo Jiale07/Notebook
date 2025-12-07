@@ -1,8 +1,13 @@
 <script lang="ts" setup>
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import {isEmpty} from "@/util/public";
+import { useDark, useToggle } from '@vueuse/core'
 
+const theme = localStorage.getItem("theme");
+const isDark = useDark({ valueDark: 'dark', valueLight: 'light' })
+doSwitchTheme(theme === "dark")
 const navList = reactive([
   {
     key: 'Matters',
@@ -20,8 +25,16 @@ const navList = reactive([
   }
 ].filter(item => !item.isHide))
 
-// 切换菜单
-let activeIndex = ref(navList[0].key) // 菜单默认选中项
+// let activeIndex = ref(navList[0].key) // 菜单默认选中项
+let activeIndex = ref() // 菜单默认选中项
+onMounted(() => {
+  // 执行数据请求
+  // 切换菜单
+  if (!isEmpty(activeIndex.value)) {
+    handleSelect(activeIndex.value)
+  }
+})
+
 function handleSelect(index: string): void {
   const targetNav =  navList.find((item) => item.key === index)
   if (targetNav) {
@@ -35,6 +48,11 @@ const userAboutButtonList = [
     key: 'logout',
     label: '退出登录',
     clickFunction: logout
+  },
+  {
+    key: 'changeTheme',
+    label: '切换主题',
+    clickFunction: switchTheme
   },
   {
     key: 'setting',
@@ -54,6 +72,15 @@ function logout() {
 }
 function toSetting() {
   ElMessage.warning('暂不支持设置')
+}
+
+function switchTheme(event) {
+  doSwitchTheme()
+  localStorage.setItem("theme", isDark.value ? "dark" : "light");
+}
+
+function doSwitchTheme(useDark?: boolean) {
+  isDark.value = isEmpty(useDark) ? !isDark.value : useDark || false
 }
 </script>
 
@@ -111,7 +138,6 @@ function toSetting() {
   .menu-box {
     display: flex;
     justify-content: space-between;
-    background-color: #ffffff;
     border-bottom: solid 1px var(--el-menu-border-color);
     flex-shrink: 0;
 
@@ -158,6 +184,8 @@ function toSetting() {
 
   .router-view-box {
     flex: 1;
+
+    background-color: var(--bg-primary);
   }
 }
 

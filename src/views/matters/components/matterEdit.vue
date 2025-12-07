@@ -242,30 +242,32 @@ watch(
   >
     <template #default>
       <div class="default-body">
-        <el-form :model="matterFrom" :key="elFormKey">
-          <el-form-item
-              v-for="(item) in matterFromItemList"
-              :key="`from-item-${item.key}`"
-              :label="item.label"
-          >
-            <el-input v-if="['name', 'content'].includes(item.key)" :disabled="!edit" v-model="item.value"></el-input>
-            <el-select
-                v-else-if="['type', 'priority'].includes(item.key)"
-                v-model="item.value"
-                class="m-2"
-                placeholder="请选择"
-                size="large"
-                :disabled="!edit"
+        <div class="form-container">
+          <el-form :model="matterFrom" :key="elFormKey">
+            <el-form-item
+                v-for="(item) in matterFromItemList"
+                :key="`from-item-${item.key}`"
+                :label="item.label"
             >
-              <el-option
-                  v-for="item in item.options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
+              <el-input v-if="['name', 'content'].includes(item.key)" :disabled="!edit" v-model="item.value"></el-input>
+              <el-select
+                  v-else-if="['type', 'priority'].includes(item.key)"
+                  v-model="item.value"
+                  class="m-2"
+                  placeholder="请选择"
+                  size="large"
+                  :disabled="!edit"
+              >
+                <el-option
+                    v-for="item in item.options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
     </template>
     <template #footer>
@@ -276,7 +278,13 @@ watch(
 
 <style scoped lang="scss">
 .default-body {
+  display: flex;
+  justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.form-container {
+  width: 800px;
 }
 </style>

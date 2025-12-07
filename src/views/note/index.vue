@@ -304,7 +304,6 @@ function handleSubmitFolderInfo() {
   .node-container {
     padding: 10px;
     border-radius: 15px;
-    background-color: #ffffff;
     margin: 10px 0;
   }
 
@@ -354,7 +353,7 @@ function handleSubmitFolderInfo() {
 
 .folder-tree-list__box {
   width: 240px;
-  border-right: 1px solid #f1f4f9;
+  border-right: 1px solid #f1f1f1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

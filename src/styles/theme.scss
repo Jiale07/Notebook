@@ -1,0 +1,14 @@
+// src/styles/theme.scss
+:root {
+  --bg-primary: #f1f1f1; // 默认背景颜色
+  --text-primary: #333333;
+  --border-color: #e0e0e0;
+  --card-bg: #ffffff;
+}
+
+:root.dark {
+  --bg-primary: #121212;
+  --text-primary: #e0e0e0;
+  --border-color: #444;
+  --card-bg: #252525;
+}
