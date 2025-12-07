@@ -74,7 +74,7 @@ function onLogin() {
 .form-box {
   width: 300px;
   height: 280px;
-  background-color: #fff;
+  background-color: var(--card-bg);
   border: 1px solid #039BD2;
   border-radius: 15px;
   padding: 10px;
